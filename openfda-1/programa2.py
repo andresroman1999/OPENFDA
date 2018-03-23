@@ -11,6 +11,6 @@ repos_raw = r1.read().decode("utf-8")
 conn.close()
 
 repos = json.loads(repos_raw)
-##print(repos)
+###print(repos)
 for i in repos["results"]:
     print("ID del producto:",repos["results"][i]["id"],"\n"+"Nombre de la fabricante:",repos["results"][i]["openfda"]["manufacturer_name"][0],"\n"+"Propósito:",repos["results"][i]["purpose"][0])
