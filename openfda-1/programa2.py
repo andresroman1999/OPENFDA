@@ -12,5 +12,19 @@ conn.close()
 
 repos = json.loads(repos_raw)
 ###print(repos)
-for i in repos["results"]:
-    print("ID del producto:",repos["results"][i]["id"],"\n"+"Nombre de la fabricante:",repos["results"][i]["openfda"]["manufacturer_name"][0],"\n"+"Propósito:",repos["results"][i]["purpose"][0])
+for i in range(10):
+#TRY:SE DISPONEN DE ESTA FORMA PARA QUE ,EN EL CASO DE QUE UNO DE LOS DATOS NO SE ENCUENTRE, EL PROGRAMA CONTINUE  EXTRAYENDO LOS DATOS
+    try:
+        print(i+1)
+        print("ID del producto:",repos["results"][i]["id"])
+    except KeyError:
+        print("No se encontraron resultados")
+    try:
+        print("Nombre de la fabricante:",repos["results"][i]["openfda"]["manufacturer_name"][0])
+    except KeyError:
+        print("No se encontraron resultados")
+    try:
+        print("Propósito:",repos["results"][i]["purpose"][0],"\n")
+    except KeyError:
+        print("No se encontraron resultados")
+        continue
