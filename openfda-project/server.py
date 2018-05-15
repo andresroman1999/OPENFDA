@@ -3,18 +3,17 @@ import http.server
 import http.client
 import json
 import socketserver
-
 PORT=8000
-
+########################################################################################################################
 class testHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
-    # GET
+
     ofda_api_url="api.fda.gov"
     ofda_api_evento="/drug/label.json"
     ofda_api_drug='&search=active_ingredient:'
     ofda_api_comp='&search=openfda.manufacturer_name:'
 
 
-    def get_main_page(self):
+    def get_pag_principal(self):
         html = """
             <html>
                 <head>
@@ -58,7 +57,7 @@ class testHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
                                 <head>
                                     <title>OpenFDA Cool App</title>
                                 </head>
-                                <body>
+                                <body style='background-color: pink'>
                                     <ul>
                             """
         for item in lista:
@@ -105,7 +104,8 @@ class testHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
             self.send_header('Content-type', 'text/html')
             self.end_headers()
 
-            html=self.get_main_page()
+            html=self.get_pag_principal()
+
             self.wfile.write(bytes(html, "utf8"))
 
         elif 'listDrugs' in self.path:
@@ -114,14 +114,15 @@ class testHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
             self.send_header('Content-type', 'text/html')
             self.end_headers()
 
-            medicamentos = []
+            medicinas = []
             resultados = self.devuelve_resultados_genericos(limit)
             for r in resultados:
                 if ('generic_name' in r['openfda']):
-                    medicamentos.append (r['openfda']['generic_name'][0])
+                    medicinas.append (r['openfda']['generic_name'][0])
                 else:
-                    medicamentos.append('Desconocido')
-            resultado_html = self.devuelve_web (medicamentos)
+                    medicinas.append('UNKNOWN')
+            resultado_html = self.devuelve_web (medicinas)
+
             self.wfile.write(bytes(resultado_html, "utf8"))
 
         elif 'listCompanies' in self.path:
@@ -138,6 +139,7 @@ class testHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
                 else:
                     comp.append('Desconocido')
             resultado_html = self.devuelve_web(comp)
+
             self.wfile.write(bytes(resultado_html, "utf8"))
 
         elif 'listWarnings' in self.path:
@@ -154,6 +156,7 @@ class testHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
                 else:
                     warnings_lista.append('Desconocido')
             resultado_html = self.devuelve_web(warnings_lista)
+            
             self.wfile.write(bytes(resultado_html, "utf8"))
 
         elif 'searchCompany' in self.path:
@@ -205,12 +208,11 @@ class testHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
             resultado_html = self.devuelve_web(drugs)
             self.wfile.write(bytes(resultado_html, "utf8"))
 
-
         elif 'secret' in self.path:
             self.send_error(401)
             self.send_header('WWW-Authenticate', 'Basic realm="Mi servidor"')
             self.end_headers()
-
+        ###########################REDIRECT????????###############################
         else:
             self.send_error(404)
             self.send_header('Content-type', 'text/plain; charset=utf-8')
