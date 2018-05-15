@@ -199,7 +199,7 @@ class testHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
             resultado_html = self.devuelve_web(companies)
             self.wfile.write(bytes(resultado_html, "utf8"))
 
-        ##COMO EL CASO ANTERIOR PERO CON EL MEDICAMENTO QUE EL USUARIO ELIJA
+        #COMO EL CASO ANTERIOR PERO CON EL MEDICAMENTO QUE EL USUARIO ELIJA
         elif 'searchDrug' in self.path:
 
             self.send_response(200)
@@ -228,16 +228,20 @@ class testHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
 #######################################################################################################################
         #En los siguientes casos, se modifican headers y el tipo de error únicamente.
         #Se utiliza el mismo criterio que en los anteriores pero esta vez deniega el acceso ya sea porque
-        #se ha definido como una ruta con acceso restringido, o pporque directamente no existe(404)
+        #se ha definido como una ruta con acceso restringido, o porque directamente no existe(404)
         elif 'secret' in self.path:
             self.send_error(401)
             self.send_header('WWW-Authenticate', 'Basic realm="Mi servidor"')
+            self.end_headers()
+        #Esta extensión devuelve a la pagina principal si es utilizado
+        elif 'redirect' in self.path:
+            self.send_response(302)
+            self.send_header('Location', 'http://localhost:' + str(PORT))
             self.end_headers()
         ###########################REDIRECT????????###############################
         #Un problema con el script de correción impedia implementar la extensión "redirect" ya que
         #no reeconocia 302 como  error.CODIGO DEL SCRIP CORRECTOR :
         ######self.assertEqual(resp.status_code, 200 )#######
-        #al ejecutar dicho script sigue surgiendo dicho problema aun siendo una extensión de la "practica básica"
 
         else:
             self.send_error(404)
