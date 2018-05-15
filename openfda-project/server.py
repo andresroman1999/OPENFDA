@@ -87,7 +87,7 @@ class testHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
         else:
             parametros = ""
 
-        limit = 25
+        limit = 10
 
         if parametros:
             pars_limit = parametros.split("=")
@@ -156,7 +156,7 @@ class testHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
                 else:
                     warnings_lista.append('Desconocido')
             resultado_html = self.devuelve_web(warnings_lista)
-            
+
             self.wfile.write(bytes(resultado_html, "utf8"))
 
         elif 'searchCompany' in self.path:
@@ -193,12 +193,12 @@ class testHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
 
             drugs = []
             conn = http.client.HTTPSConnection(self.ofda_api_url)
-            conn.request("GET", self.ofda_api_evento + "?limit="+str(limit) + self.ofda_api_comp + drug)
+            conn.request("GET", self.ofda_api_evento + "?limit="+str(limit) + self.ofda_api_drug + drug)
             r1 = conn.getresponse()
             data1 = r1.read()
             data = data1.decode("utf8")
-            datosofda2 = json.loads(data)
-            events_search_drug = datosofda2['results']
+            datosofda_2 = json.loads(data)
+            events_search_drug = datosofda_2['results']
             for r in events_search_drug:
                 if ('generic_name' in r['openfda']):
                     drugs.append(r['openfda']['generic_name'][0])
