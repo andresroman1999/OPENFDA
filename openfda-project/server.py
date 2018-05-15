@@ -186,8 +186,8 @@ class testHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
             r1 = conn.getresponse()
             data1 = r1.read()
             data = data1.decode("utf8")
-        #La diferenciia radica en que esta vez el usuario de la pagina interviene en la "construcción" de la url,definiendo el ombre concreto de, en este caso,
-        #el nombre de la coompañia.
+        #La diferenciia radica en que esta vez el usuario de la pagina interviene en la "construcción" de la url,definiendo el nombre concreto de, en este caso,
+        #la coompañia.
             datosofda = json.loads(data)
             events_search_comp = datosofda['results']
 
@@ -195,7 +195,7 @@ class testHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
                 companies.append(event['openfda']['manufacturer_name'][0])
             resultado_html = self.devuelve_web(companies)
             self.wfile.write(bytes(resultado_html, "utf8"))
-
+        ##COMO EL CASO ANTERIOR PERO CON EL MEDICAMENTO QUE EL USUARIO ELIJA
         elif 'searchDrug' in self.path:
 
             self.send_response(200)
@@ -237,7 +237,7 @@ class testHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
             self.send_error(404)
             self.send_header('Content-type', 'text/plain; charset=utf-8')
             self.end_headers()
-            #self.wfile.write("WHAT IS  '{}'?".format(self.path).encode())
+            
 
         return
 
