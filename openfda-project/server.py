@@ -8,10 +8,10 @@ PORT=8000
 
 class testHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
     # GET
-    OPENFDA_API_URL="api.fda.gov"
-    OPENFDA_API_EVENT="/drug/label.json"
-    OPENFDA_API_DRUG='&search=active_ingredient:'
-    OPENFDA_API_COMPANY='&search=openfda.manufacturer_name:'
+    ofda_api_url="api.fda.gov"
+    ofda_api_evento="/drug/label.json"
+    ofda_api_drug='&search=active_ingredient:'
+    ofda_api_comp='&search=openfda.manufacturer_name:'
 
 
     def get_main_page(self):
@@ -71,14 +71,15 @@ class testHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
                         """
         return list_html
     def devuelve_resultados_genericos (self, limit=10):
-        conn = http.client.HTTPSConnection(self.OPENFDA_API_URL)
-        conn.request("GET", self.OPENFDA_API_EVENT + "?limit="+str(limit))
-        print (self.OPENFDA_API_EVENT + "?limit="+str(limit))
+        conn = http.client.HTTPSConnection(self.ofda_api_url)
+        conn.request("GET", self.ofda_api_evento + "?limit="+str(limit))
+        print (self.ofda_api_evento + "?limit="+str(limit))
         r1 = conn.getresponse()
         data_raw = r1.read().decode("utf8")
         data = json.loads(data_raw)
         resultados = data['results']
         return resultados
+
     def do_GET(self):
         recursos = self.path.split("?")
         if len(recursos) > 1:
@@ -86,9 +87,8 @@ class testHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
         else:
             parametros = ""
 
-        limit = 50
+        limit = 25
 
-        # Obtener los parametros
         if parametros:
             pars_limit = parametros.split("=")
             if pars_limit[0] == "limit":
@@ -100,20 +100,22 @@ class testHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
 
 
 
-        # Write content as utf-8 data
+
         if self.path=='/':
-            # Send response status code
+
             self.send_response(200)
-            # Send headers
             self.send_header('Content-type', 'text/html')
             self.end_headers()
+
             html=self.get_main_page()
             self.wfile.write(bytes(html, "utf8"))
 
         elif 'listDrugs' in self.path:
+
             self.send_response(200)
             self.send_header('Content-type', 'text/html')
             self.end_headers()
+
             medicamentos = []
             resultados = self.devuelve_resultados_genericos(limit)
             for resultado in resultados:
@@ -125,10 +127,11 @@ class testHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
             self.wfile.write(bytes(resultado_html, "utf8"))
 
         elif 'listCompanies' in self.path:
+
             self.send_response(200)
-            # Send headers
             self.send_header('Content-type', 'text/html')
             self.end_headers()
+
             companies = []
             resultados = self.devuelve_resultados_genericos (limit)
             for resultado in resultados:
@@ -140,12 +143,11 @@ class testHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
             self.wfile.write(bytes(resultado_html, "utf8"))
 
         elif 'listWarnings' in self.path:
-            # Send response status code
-            self.send_response(200)
 
-            # Send headers
+            self.send_response(200)
             self.send_header('Content-type', 'text/html')
             self.end_headers()
+
             warnings = []
             resultados = self.devuelve_resultados_genericos (limit)
             for resultado in resultados:
@@ -157,19 +159,17 @@ class testHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
             self.wfile.write(bytes(resultado_html, "utf8"))
 
         elif 'searchDrug' in self.path:
-            # Send response status code
-            self.send_response(200)
 
-            # Send headers
+            self.send_response(200)
             self.send_header('Content-type', 'text/html')
             self.end_headers()
-            #Por defecto 10 en este caso, no 1
+
             limit = 10
             drug=self.path.split('=')[1]
 
             drugs = []
-            conn = http.client.HTTPSConnection(self.OPENFDA_API_URL)
-            conn.request("GET", self.OPENFDA_API_EVENT + "?limit="+str(limit) + self.OPENFDA_API_DRUG + drug)
+            conn = http.client.HTTPSConnection(self.ofda_api_url)
+            conn.request("GET", self.ofda_api_evento + "?limit="+str(limit) + self.ofda_api_comp + drug)
             r1 = conn.getresponse()
             data1 = r1.read()
             data = data1.decode("utf8")
@@ -184,18 +184,16 @@ class testHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
             resultado_html = self.devuelve_web(drugs)
             self.wfile.write(bytes(resultado_html, "utf8"))
         elif 'searchCompany' in self.path:
-            # Send response status code
-            self.send_response(200)
 
-            # Send headers
+            self.send_response(200)
             self.send_header('Content-type', 'text/html')
             self.end_headers()
-            # Por defecto 10 en este caso, no 1
+
             limit = 10
             company=self.path.split('=')[1]
             companies = []
-            conn = http.client.HTTPSConnection(self.OPENFDA_API_URL)
-            conn.request("GET", self.OPENFDA_API_EVENT + "?limit=" + str(limit) + self.OPENFDA_API_COMPANY + company)
+            conn = http.client.HTTPSConnection(self.ofda_api_url)
+            conn.request("GET", self.ofda_api_evento + "?limit=" + str(limit) + self.ofda_api_comp + company)
             r1 = conn.getresponse()
             data1 = r1.read()
             data = data1.decode("utf8")
@@ -211,19 +209,19 @@ class testHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
             self.send_error(401)
             self.send_header('WWW-Authenticate', 'Basic realm="Mi servidor"')
             self.end_headers()
+
         else:
             self.send_error(404)
             self.send_header('Content-type', 'text/plain; charset=utf-8')
             self.end_headers()
             self.wfile.write("WHAT IS  '{}'?".format(self.path).encode())
+
         return
 
 
 
 socketserver.TCPServer.allow_reuse_address= True
-
 Handler = testHTTPRequestHandler
-
 httpd = socketserver.TCPServer(("", PORT), Handler)
 print("serving at port", PORT)
 httpd.serve_forever()
