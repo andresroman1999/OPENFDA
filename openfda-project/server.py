@@ -166,18 +166,18 @@ class testHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
             resultado_html = self.devuelve_web(peligros)
 
             self.wfile.write(bytes(resultado_html, "utf8"))
-
+        #En los casos siguientes el codigo utilizado es muy parecido.
         elif 'searchCompany' in self.path:
 
             self.send_response(200)
             self.send_header('Content-type', 'text/html')
             self.end_headers()
-
+        #Se construye a URL y se utilizan los distintos metodos de la API para buscar los datos en "results"
             limit = 10
             comp=self.path.split('=')[1]
-            comps = []
+            companies = []
             conn = http.client.HTTPSConnection(self.ofda_api_url)
-            conn.request("GET", self.ofda_api_evento + "?limit=" + str(limit) + self.ofda_api_comp + comps)
+            conn.request("GET", self.ofda_api_evento + "?limit=" + str(limit) + self.ofda_api_comp + comp)
             r1 = conn.getresponse()
             data1 = r1.read()
             data = data1.decode("utf8")
@@ -186,8 +186,8 @@ class testHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
             events_search_comp = datosofda['results']
 
             for event in events_search_comp:
-                comps.append(event['openfda']['manufacturer_name'][0])
-            resultado_html = self.devuelve_web(comps)
+                companies.append(event['openfda']['manufacturer_name'][0])
+            resultado_html = self.devuelve_web(companies)
             self.wfile.write(bytes(resultado_html, "utf8"))
 
         elif 'searchDrug' in self.path:
@@ -215,7 +215,7 @@ class testHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
 
             resultado_html = self.devuelve_web(drugs)
             self.wfile.write(bytes(resultado_html, "utf8"))
-            
+
         #En los siguientes casos, se modifican headers y el tipo de error únicamente.
         elif 'secret' in self.path:
             self.send_error(401)
@@ -225,7 +225,7 @@ class testHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
         #Un problema con el script de correción impedia implementar la extensión "redirect" ya que
         #no reeconocia 302 como  error.CODIGO DEL SCRIP CORRECTOR :
         ######self.assertEqual(resp.status_code, 200 )#######
-
+        #al ejecutar dicho script sigue surgiendo dicho problema au siendo una extensión de la "practica básica"
 
         else:
             self.send_error(404)
